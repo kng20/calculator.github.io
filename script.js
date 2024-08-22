@@ -14,6 +14,40 @@ let operator = null;
 let firstOperand = null;
 let awaitingSecondOperand = false;
 
+document.addEventListener('keydown', function(event) {
+    const key = event.key;
+
+    if (event.altKey) {
+        if (key === '8') { // Alt + 8 para '*'
+            handleButtonClick('*');
+        } else if (key === '9') { // Alt + 9 para otra función (ejemplo)
+            handleButtonClick('(');
+        }
+    } else {
+        if (!isNaN(key)) {
+            handleButtonClick(key); // Si es un número
+        } else if (key === '.') {
+            handleButtonClick('.'); // Punto decimal
+        } else if (key === 'Enter' || key === '=') {
+            handleButtonClick('='); // Enter o '=' para calcular
+        } else if (key === 'Escape' || key.toLowerCase() === 'c') {
+            handleButtonClick('AC'); // Escape o 'C' para limpiar la calculadora
+        } else if (key === '+') {
+            handleButtonClick('+'); // Suma
+        } else if (key === '-') {
+            handleButtonClick('-'); // Resta
+        } else if (key === '*' || key === 'x') {
+            handleButtonClick('*'); // Multiplicación
+        } else if (key === '/' || key === '÷') {
+            handleButtonClick('/'); // División
+        } else if (key === '%') {
+            handleButtonClick('%'); // Porcentaje
+        } else if (key === '±') {
+            handleButtonClick('±'); // Signo +/-
+        }
+    }
+});
+
 function handleButtonClick(value) {
     playSound(); // Reproducir sonido al hacer clic en cualquier botón
 
@@ -47,6 +81,12 @@ function appendNumber(number) {
 }
 
 function appendOperator(op) {
+    if (op === '±') {
+        currentValue = `${parseFloat(currentValue) * -1}`;
+        updateDisplay();
+        return;
+    }
+
     if (operator && awaitingSecondOperand) {
         operator = op;
         return;
