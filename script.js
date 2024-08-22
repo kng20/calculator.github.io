@@ -131,3 +131,4 @@ function calculateOperation(first, second, op) {
 function updateDisplay() {
     display.textContent = currentValue;
 }
+
