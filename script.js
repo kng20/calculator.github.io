@@ -19,6 +19,10 @@ const MAX_DISPLAY_DIGITS = 12;
 const themeToggleButton = document.getElementById('theme-toggle');
 const body = document.body;
 
+// Configurar el modo oscuro por defecto
+body.classList.add('dark-mode');
+themeToggleButton.textContent = '☀️'; // Mostrar ícono de sol para dark mode
+
 themeToggleButton.addEventListener('click', () => {
     if (body.classList.contains('dark-mode')) {
         body.classList.remove('dark-mode');
@@ -108,18 +112,11 @@ function appendOperator(op) {
         return;
     }
 
-    if (operator && awaitingSecondOperand) {
-        operator = op;
-        return;
-    }
-
     if (firstOperand === null) {
         firstOperand = parseFloat(currentValue);
     } else if (operator) {
-        const result = calculateOperation(firstOperand, parseFloat(currentValue), operator);
-        currentValue = `${result}`;
-        firstOperand = result;
-    } else {
+        const result = performCalculation[operator](firstOperand, parseFloat(currentValue));
+        currentValue = `${parseFloat(result.toFixed(MAX_DISPLAY_DIGITS))}`;
         firstOperand = parseFloat(currentValue);
     }
 
@@ -128,46 +125,40 @@ function appendOperator(op) {
     updateDisplay();
 }
 
+const performCalculation = {
+    '/': (firstOperand, secondOperand) => firstOperand / secondOperand,
+    '*': (firstOperand, secondOperand) => firstOperand * secondOperand,
+    '+': (firstOperand, secondOperand) => firstOperand + secondOperand,
+    '-': (firstOperand, secondOperand) => firstOperand - secondOperand,
+    '%': (firstOperand, secondOperand) => firstOperand % secondOperand,
+};
+
 function calculate() {
+    let result;
+
     if (operator && !awaitingSecondOperand) {
-        const result = calculateOperation(firstOperand, parseFloat(currentValue), operator);
-        currentValue = `${result}`;
+        result = performCalculation[operator](firstOperand, parseFloat(currentValue));
+
+        currentValue = `${parseFloat(result.toFixed(MAX_DISPLAY_DIGITS))}`;
         operator = null;
         firstOperand = null;
         awaitingSecondOperand = false;
+
         updateDisplay();
     }
 }
 
-function calculateOperation(first, second, op) {
-    switch (op) {
-        case '+': return first + second;
-        case '-': return first - second;
-        case '*': return first * second;
-        case '/': return first / second;
-        case '%': return first % second;
-        case '±': return first * -1;
-        default: return second;
-    }
-}
-
-function formatNumber(number) {
-    // Convierte el número a formato decimal con comas y limita el tamaño de la pantalla
-    if (isNaN(number)) return '0';
-    let numberStr = number.toString();
-    
-    // Limitar la cantidad de dígitos a mostrar en la pantalla
-    if (numberStr.length > MAX_DISPLAY_DIGITS) {
-        numberStr = number.toExponential(2); // Usar notación científica si el número es demasiado grande
-    }
-    
-    return numberStr.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-}
-
 function updateDisplay() {
-    let value = parseFloat(currentValue);
-    display.textContent = formatNumber(value);
+    // Formatear el valor actual con comas
+    let formattedValue = parseFloat(currentValue).toLocaleString('en-US', {
+        maximumFractionDigits: MAX_DISPLAY_DIGITS
+    });
+
+    display.textContent = formattedValue.length > MAX_DISPLAY_DIGITS 
+        ? formattedValue.slice(0, MAX_DISPLAY_DIGITS) 
+        : formattedValue;
 }
+
 
 
 
