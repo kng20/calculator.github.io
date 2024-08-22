@@ -46,6 +46,8 @@ document.addEventListener('keydown', function(event) {
             handleButtonClick('±'); // Signo +/-
         }
     }
+
+    event.preventDefault(); // Evita que las teclas realicen acciones por defecto
 });
 
 function handleButtonClick(value) {
